@@ -1,6 +1,6 @@
 import axios from "axios";
 import prismaClient from "../prisma";
-import {sign} from "jsonwebtoken";
+import { sign } from "jsonwebtoken";
 
 /**
  * Receber code(string)
@@ -14,20 +14,20 @@ import {sign} from "jsonwebtoken";
 
 interface IAccessTokenResponse { //vai fazer o axios devolver só o access token 
     access_token: string
-}
+};
 
 interface IUserResponse { //Vai pegar só esses dados desejados do nosso access_token
     avatar_url: string,
     login: string,
     id: number,
     name: string
-}
+};
 
 class AuthenticateUserService {
-    async execute(code:string) {
+    async execute(code: string) {
         const url = "https://github.com/login/oauth/access_token"; //url pra acessar nosso access_token
 
-        const {data: AccessTokenResponse} = await axios.post<IAccessTokenResponse>(url, null, { //Acessa os dados retornados pelo login do github e os imprime em json
+        const { data: AccessTokenResponse } = await axios.post<IAccessTokenResponse>(url, null, { //Acessa os dados retornados pelo login do github e os imprime em json
             params: {
                 client_id: process.env.GITHUB_CLIENT_ID,
                 client_secret: process.env.GITHUB_CLIENT_SECRET,
@@ -39,13 +39,13 @@ class AuthenticateUserService {
         });
         //pega todas as informações do usuário que está logado na aplicação
         // por isso o segundo parâmetro tem que ter o tipo do token (bearer) e o access_token
-        const response = await axios.get<IUserResponse>("https://api.github.com/user", { 
+        const response = await axios.get<IUserResponse>("https://api.github.com/user", {
             headers: {
                 authorization: `Bearer ${AccessTokenResponse.access_token}` //Tipo do token e token
             }
         });
         //guarda todos os dados do usuário
-        const {login, id, avatar_url, name} = response.data; 
+        const { login, id, avatar_url, name } = response.data;
         // recebe o model que criamos para os dados do usuário lá no nosso schema.prisma
         let user = await prismaClient.user.findFirst({ //procura no nosso banco de dados se já existe o usuário
             where: {
@@ -53,7 +53,7 @@ class AuthenticateUserService {
             }
         });
         // se o usuário não existir
-        if(!user) {
+        if (!user) {
             user = await prismaClient.user.create({
                 data: { //parâmetro que traz todas as informações do nosso model e salvamos de acordo com os dados do usuário
                     github_id: id,
@@ -79,8 +79,8 @@ class AuthenticateUserService {
             }
         );
 
-        return {token, user};                               
+        return { token, user };
     }
 }
 
-export {AuthenticateUserService}
+export { AuthenticateUserService }

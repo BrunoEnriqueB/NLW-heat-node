@@ -1,4 +1,4 @@
-import {Router} from "express";
+import { Router } from "express";
 import { AuthenticateUserController } from "./controllers/AuthenticateUserController";
 import { CreateMessageController } from "./controllers/CreateMessageController";
 import { ensureAuthenticated } from "./middleware/ensureAuthenticated";
@@ -15,4 +15,4 @@ router.get("/messages/last3", new GetLast3MessagesController().handle); //pega a
 
 router.get("/profile", ensureAuthenticated, new ProfileUserController().handle); //devolve as informações do usuário
 
-export {router}
+export { router };
