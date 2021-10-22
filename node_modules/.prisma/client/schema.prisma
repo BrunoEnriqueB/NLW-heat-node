@@ -10,12 +10,24 @@ datasource db {
   url      = "file:./dev.db"
 }
 
-model User { //modelo da tabela do user no DB
-  id            String @id @default(uuid())
-  name          String
-  github_id     Int
-  avatar_url    String
-  login         String
+model User {
+  id         String @id @default(uuid())
+  name       String
+  github_id  Int
+  avatar_url String
+  login      String
 
-  @@map("users") //nome da tabela no banco
+  @@map("users")
+  messages Message[] //relacionamento com a tabela message
+}
+
+model Message {
+  id         String   @id @default(uuid()) //id da mensagem
+  text       String //A mensagem em si
+  created_at DateTime @default(now()) // Quando foi criada
+
+  user User @relation(fields: [user_id], references: [id]) //relacionamento com a tabela users
+
+  @@map("messages") //nome da tabela
+  user_id String
 }
